@@ -1,0 +1,57 @@
+> # ---------- Q7: Load the survey data and summarise by segment ----------
+> survey <- read.csv("survey_data.csv")   # load the 5,000 survey responses
+> str(survey)                              # check variable types
+'data.frame':	5000 obs. of  6 variables:
+ $ customer_id   : int  1 2 3 4 5 6 7 8 9 10 ...
+ $ last_visit    : num  0.202 0.203 1.171 1.11 0.197 ...
+ $ eat_frequency : int  4 7 1 0 4 0 3 0 1 0 ...
+ $ average_spend : num  20.3 30.7 42.2 22.3 32.3 ...
+ $ retention_rate: num  0.7695 0.6882 0.0843 0.0748 0.8118 ...
+ $ foodie        : int  1 1 0 0 1 0 0 0 0 0 ...
+> colSums(is.na(survey))                   # check for missing values
+   customer_id     last_visit  eat_frequency  average_spend retention_rate         foodie 
+             0              0              0              0              0              0 
+> table(survey$foodie)                     # segment sizes (1 = foodie, 0 = non-foodie)
+
+   0    1 
+3508 1492 
+> prop.table(table(survey$foodie))         # segment shares
+
+     0      1 
+0.7016 0.2984 
+> foodie     <- subset(survey, foodie == 1)  # foodie segment
+> non_foodie <- subset(survey, foodie == 0)  # non-foodie segment
+> vars <- c("last_visit", "eat_frequency", "average_spend", "retention_rate")
+> summary(foodie[, vars])       # summary statistics - foodies
+   last_visit     eat_frequency    average_spend     retention_rate  
+ Min.   :0.1027   Min.   : 0.000   Min.   :  7.393   Min.   :0.5410  
+ 1st Qu.:0.1753   1st Qu.: 3.000   1st Qu.: 22.730   1st Qu.:0.6677  
+ Median :0.2002   Median : 5.000   Median : 29.701   Median :0.7013  
+ Mean   :0.2034   Mean   : 4.939   Mean   : 32.211   Mean   :0.7008  
+ 3rd Qu.:0.2269   3rd Qu.: 6.000   3rd Qu.: 38.862   3rd Qu.:0.7323  
+ Max.   :0.3861   Max.   :10.000   Max.   :114.851   Max.   :0.8498  
+> summary(non_foodie[, vars])   # summary statistics - non-foodies
+   last_visit     eat_frequency   average_spend    retention_rate     
+ Min.   :0.4804   Min.   :0.000   Min.   : 5.632   Min.   :0.0001123  
+ 1st Qu.:0.8734   1st Qu.:0.000   1st Qu.:15.138   1st Qu.:0.0690323  
+ Median :0.9963   Median :1.000   Median :20.027   Median :0.1013832  
+ Mean   :1.0187   Mean   :1.013   Mean   :21.559   Mean   :0.1018466  
+ 3rd Qu.:1.1463   3rd Qu.:2.000   3rd Qu.:26.079   3rd Qu.:0.1334565  
+ Max.   :1.9916   Max.   :6.000   Max.   :77.604   Max.   :0.2850950  
+> # Standard deviations, to compare dispersion between segments
+> round(sapply(foodie[, vars], sd), 3)
+    last_visit  eat_frequency  average_spend retention_rate 
+         0.040          2.075         13.482          0.050 
+> round(sapply(non_foodie[, vars], sd), 3)
+    last_visit  eat_frequency  average_spend retention_rate 
+         0.205          1.008          8.927          0.046 
+> # Data-quality checks relevant to the survey design (Q6)
+> sum(survey$eat_frequency == 0)                  # respondents claiming 0 visits/month
+[1] 1277
+> tapply(survey$eat_frequency == 0, survey$foodie, sum)  # ... by segment
+   0    1 
+1271    6 
+> sum(survey$eat_frequency %% 1 != 0)             # slider gives only whole numbers?
+[1] 0
+> range(survey$average_spend)                     # spend range vs 0-200 slider
+[1]   5.632056 114.850823

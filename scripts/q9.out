@@ -1,0 +1,37 @@
+> # ---------- Q9: CLV for FOODIE customers ----------
+> COGS <- 0.50          # cost of goods sold = 50% of revenue
+> N    <- 24            # 2-year customer life, measured in monthly periods
+> k_annual <- 0.10      # HSBC SME loan rate (annual)
+> k    <- k_annual / 12 # monthly discount rate (Week 1 Apple-case conversion: annual rate / 12)
+> c    <- 0             # no variable marketing cost per period after acquisition
+> M <- monthly_spend_foodie * (1 - COGS)  # monthly gross margin per foodie
+> g <- M - c                              # monthly profit net of variable marketing cost
+> g_seq <- rep(g, N)                      # profit sequence for all 24 periods
+> g_seq
+ [1] 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495
+[10] 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495
+[19] 79.54495 79.54495 79.54495 79.54495 79.54495 79.54495
+> r <- avg_retention_foodie               # segment-average monthly retention rate
+> r
+[1] 0.7007933
+> # Period 1 revenue is earned (booked at the end of month 1) by every newly acquired customer,
+> # so the survival probability for period t is r^(t-1): 1, r, r^2, ..., r^(N-1)
+> g_seq_after_retention <- g_seq * r^(0:(N - 1))
+> round(g_seq_after_retention, 3)
+ [1] 79.545 55.745 39.065 27.377 19.185 13.445  9.422  6.603  4.627  3.243  2.273  1.593
+[13]  1.116  0.782  0.548  0.384  0.269  0.189  0.132  0.093  0.065  0.045  0.032  0.022
+> d <- 1 / (1 + k)^(1:N)                  # discount factors: cash flows arrive at the END of each month
+> g_seq_after_retention_discount <- g_seq_after_retention * d
+> round(g_seq_after_retention_discount, 3)
+ [1] 78.888 54.827 38.105 26.483 18.406 12.792  8.890  6.179  4.294  2.985  2.074  1.442
+[13]  1.002  0.696  0.484  0.336  0.234  0.162  0.113  0.078  0.055  0.038  0.026  0.018
+> CLV_foodie <- sum(g_seq_after_retention_discount)  # customer lifetime value of a foodie
+> CLV_foodie
+[1] 258.6073
+> # Profitability check against the planned SEM acquisition cost
+> CLV_foodie - CAC_SEM                    # net value per acquired foodie
+[1] 256.2073
+> CLV_foodie / CAC_SEM                    # CLV-to-CAC ratio
+[1] 107.7531
+> CLV_foodie > CAC_SEM                    # profitable to acquire?
+[1] TRUE

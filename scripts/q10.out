@@ -1,0 +1,36 @@
+> # ---------- Q10: CLV for NON-FOODIE customers ----------
+> # COGS, N, k and c are unchanged from Q9
+> M <- monthly_spend_non * (1 - COGS)     # monthly gross margin per non-foodie
+> g <- M - c                              # monthly profit net of variable marketing cost
+> g_seq <- rep(g, N)                      # profit sequence for all 24 periods
+> g_seq
+ [1] 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448
+[10] 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448
+[19] 10.91448 10.91448 10.91448 10.91448 10.91448 10.91448
+> r <- avg_retention_non                  # segment-average monthly retention rate
+> r
+[1] 0.1018466
+> g_seq_after_retention <- g_seq * r^(0:(N - 1))  # survival-weighted profit (same timing as Q9)
+> round(g_seq_after_retention, 4)
+ [1] 10.9145  1.1116  0.1132  0.0115  0.0012  0.0001  0.0000  0.0000  0.0000  0.0000
+[11]  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
+[21]  0.0000  0.0000  0.0000  0.0000
+> d <- 1 / (1 + k)^(1:N)                  # end-of-month discount factors
+> g_seq_after_retention_discount <- g_seq_after_retention * d
+> round(g_seq_after_retention_discount, 4)
+ [1] 10.8243  1.0933  0.1104  0.0112  0.0011  0.0001  0.0000  0.0000  0.0000  0.0000
+[11]  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
+[21]  0.0000  0.0000  0.0000  0.0000
+> CLV_non_foodie <- sum(g_seq_after_retention_discount)  # CLV of a non-foodie
+> CLV_non_foodie
+[1] 12.04042
+> CLV_non_foodie - CAC_SEM                # net value per acquired non-foodie
+[1] 9.64042
+> CLV_non_foodie / CAC_SEM                # CLV-to-CAC ratio
+[1] 5.016842
+> CLV_non_foodie > CAC_SEM                # profitable to acquire via SEM?
+[1] TRUE
+> # Compare with the other channels too
+> c(blanket = CLV_non_foodie > CAC_blanket, targeted = CLV_non_foodie > CAC_targeted)
+ blanket targeted 
+   FALSE    FALSE 

@@ -1,0 +1,21 @@
+# ---------- Appendix: sensitivity of CLV to timing and discount-rate conventions ----------
+k_compound <- (1 + k_annual)^(1/12) - 1   # compound monthly equivalent (NOT the class method)
+clv_alt <- function(monthly_spend, margin_rate, r, k, start) {
+  g_seq <- rep(monthly_spend * margin_rate - c, N)
+  sum(g_seq * r^(start:(N - 1 + start)) / (1 + k)^(1:N))
+}
+sens <- data.frame(
+  convention = c("Main: r^(0:N-1), k = 10%/12", "r^(0:N-1), compound k", "r^(1:N), k = 10%/12"),
+  foodie = c(clv_alt(monthly_spend_foodie, 1 - COGS, avg_retention_foodie, k, 0),
+             clv_alt(monthly_spend_foodie, 1 - COGS, avg_retention_foodie, k_compound, 0),
+             clv_alt(monthly_spend_foodie, 1 - COGS, avg_retention_foodie, k, 1)),
+  non_foodie = c(clv_alt(monthly_spend_non, 1 - COGS, avg_retention_non, k, 0),
+                 clv_alt(monthly_spend_non, 1 - COGS, avg_retention_non, k_compound, 0),
+                 clv_alt(monthly_spend_non, 1 - COGS, avg_retention_non, k, 1)),
+  foodie_promo = c(clv_alt(monthly_spend_foodie, margin_rate_promo, r_foodie_promo, k, 0),
+                   clv_alt(monthly_spend_foodie, margin_rate_promo, r_foodie_promo, k_compound, 0),
+                   clv_alt(monthly_spend_foodie, margin_rate_promo, r_foodie_promo, k, 1)),
+  non_foodie_promo = c(clv_alt(monthly_spend_non, margin_rate_promo, r_non_promo, k, 0),
+                       clv_alt(monthly_spend_non, margin_rate_promo, r_non_promo, k_compound, 0),
+                       clv_alt(monthly_spend_non, margin_rate_promo, r_non_promo, k, 1)))
+print(sens, digits = 4)

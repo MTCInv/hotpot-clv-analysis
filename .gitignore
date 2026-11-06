@@ -1,0 +1,8 @@
+.DS_Store
+*.swp
+*~
+.Rhistory
+.RData
+.Rproj.user/
+.idea/
+__pycache__/

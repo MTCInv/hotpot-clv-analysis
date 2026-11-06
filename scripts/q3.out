@@ -1,0 +1,42 @@
+> # ---------- Q3: Customer Acquisition Cost (CAC) for three methods ----------
+> # (1) Blanket (non-targeted) menu drop
+> menu_cost      <- 0.50   # cost to print one menu (GBP)
+> labour_cost    <- 0.10   # labour cost per menu distributed (GBP)
+> response_blank <- 0.02   # expected response rate of blanket distribution
+> cost_per_contact_blank <- menu_cost + labour_cost       # total cost of reaching one household
+> CAC_blanket <- cost_per_contact_blank / response_blank  # cost per acquired customer
+> CAC_blanket
+[1] 30
+> # (2) Targeted mailing using a purchased "foodie" list
+> list_cost     <- 0.60   # price per name on the list (GBP)
+> postage_cost  <- 0.10   # Royal Mail 2nd-class postage per letter (GBP)
+> response_targ <- 0.05   # conservative response rate chosen by Tom (agency claims 10%)
+> cost_per_contact_targ <- list_cost + postage_cost       # cost of one mailed contact
+> CAC_targeted <- cost_per_contact_targ / response_targ   # cost per acquired customer
+> CAC_targeted
+[1] 14
+> # (3) Search engine marketing (pay-per-click)
+> CPC            <- 0.60   # cost per click (GBP) - Google charges only when the ad is clicked
+> p_exposed      <- 0.005  # share of searchers who see the ad (affects VOLUME, not cost per click)
+> p_click        <- 0.20   # share of exposed users who click through to the menu
+> p_dine         <- 0.25   # share of clickers (menu viewers) who visit and dine
+> # Tom pays only for clicks, so the relevant funnel stage is click -> dine.
+> # Exposure (0.5%) and click-through (20%) determine how many clicks Tom buys, not the price of each one.
+> CAC_SEM <- CPC / p_dine  # cost per acquired customer
+> CAC_SEM
+[1] 2.4
+> # Sensitivity check: if the GBP 0.60 were instead paid per EXPOSED user (CPM-style pricing),
+> # the cost per customer would be CPC / (p_click * p_dine)
+> CAC_SEM_if_paid_per_exposure <- CPC / (p_click * p_dine)
+> CAC_SEM_if_paid_per_exposure
+[1] 12
+> # Summary table of the three acquisition methods
+> CAC_table <- data.frame(method = c("Blanket menu", "Targeted mailing", "SEM (PPC)"),
++                         cost_per_contact = c(cost_per_contact_blank, cost_per_contact_targ, CPC),
++                         conversion = c(response_blank, response_targ, p_dine),
++                         CAC = c(CAC_blanket, CAC_targeted, CAC_SEM))
+> CAC_table
+            method cost_per_contact conversion  CAC
+1     Blanket menu              0.6       0.02 30.0
+2 Targeted mailing              0.7       0.05 14.0
+3        SEM (PPC)              0.6       0.25  2.4
